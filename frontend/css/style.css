@@ -1,0 +1,214 @@
+/* ======================== Reset & Base Styles ======================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('../images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* ======================== Container ======================== */
+.container-custom {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* ======================== Back Button ======================== */
+.back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-5px);
+}
+
+/* ======================== Prediction Card ======================== */
+.prediction-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+/* Card Header (Change gradient per disease) */
+.card-header-custom {
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.card-header-custom i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.card-header-custom h2 {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+/* Card Body */
+.card-body-custom {
+    padding: 2.5rem;
+}
+
+/* ======================== Form Styles ======================== */
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.form-label .required {
+    color: #e74c3c;
+}
+
+.form-control, .form-select {
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #e74c3c; /* default diabetes color, override in HTML for other diseases */
+    box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+}
+
+/* ======================== Predict Button ======================== */
+.btn-predict {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 10px;
+    color: white;
+    border: none;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    margin-top: 1.5rem;
+}
+
+.btn-predict:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+}
+
+/* ======================== Result Card ======================== */
+.result-card {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 2rem;
+    margin-top: 2rem;
+    border-left: 5px solid #e74c3c; /* default diabetes color, override in HTML */
+    display: none;
+}
+
+.result-card.show {
+    display: block;
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Result Header */
+.result-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.result-icon {
+    font-size: 3rem;
+}
+
+.result-icon.positive {
+    color: #e74c3c; /* Diabetes positive */
+}
+
+.result-icon.negative {
+    color: #27ae60; /* Heart negative example */
+}
+
+.result-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* Confidence bar */
+.confidence-bar {
+    background: #e0e0e0;
+    height: 30px;
+    border-radius: 15px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.confidence-fill {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    transition: width 1s ease;
+}
+
+/* ======================== Recommendations ======================== */
+.recommendations {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-top: 1.5rem;
+}
+
+.recommendations h5 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.recommendations ul {
+    list-style: none;
+    padding: 0;
+}
+
+.recommendations li {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 3px solid #e74c3c; /* default diabetes color */
+}
+
+.recommendations li i {
+    color: #e74c3c; /* default diabetes color */
+    margin-right: 0.5rem;
+}

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kidney Disease Prediction - AarogyaAI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            min-height: 100vh;
+            padding: 20px;
+            background:
+                linear-gradient(135deg, rgba(118, 139, 231, 0.45) 0%, rgba(215,184,245,0.45) 100%),
+                url('images/background.jpg') center/cover no-repeat fixed;
+        }
+        .container-custom { max-width: 900px; margin: 0 auto; }
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.3); transform: translateX(-5px); }
+
+        .prediction-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .card-header-custom i { font-size: 3rem; margin-bottom: 1rem; }
+        .card-header-custom h2 { margin: 0; font-weight: bold; }
+
+        .card-body-custom { padding: 2.5rem; }
+        .form-label { font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem; }
+        .form-label .required { color: #e74c3c; }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #9b59b6;
+            box-shadow: 0 0 0 0.2rem rgba(155, 89, 182, 0.25);
+        }
+
+        .btn-predict {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+            cursor: pointer;
+        }
+        .btn-predict:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(155, 89, 182, 0.4); }
+
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border-left: 5px solid #9b59b6;
+            display: none;
+        }
+        .result-card.show { display: block; animation: slideIn 0.5s ease; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-icon { font-size: 3rem; }
+        .result-icon.positive { color: #e74c3c; }
+        .result-icon.negative { color: #27ae60; }
+
+        .confidence-bar {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #9b59b6, #8e44ad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 1s ease;
+        }
+
+        .recommendations ul { list-style: none; padding: 0; }
+        .recommendations li {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #fff;
+            border-radius: 8px;
+            border-left: 3px solid #9b59b6;
+        }
+
+        .appointment-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e0e0e0;
+        }
+        .btn-appointment {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-appointment:hover { transform: scale(1.05); }
+
+        .appointment-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 1.5rem;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .appointment-form.show { display: block; animation: slideIn 0.5s ease; }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-overlay.show { display: flex; }
+        .spinner {
+            width: 60px; height: 60px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content text-center text-white">
+        <div class="spinner"></div>
+        <h4>Analyzing your kidney health data...</h4>
+        <p>Please wait while our AI processes your information</p>
+    </div>
+</div>
+<div class="container-custom">
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </button>
+
+    <div class="prediction-card">
+        <div class="card-header-custom">
+            <i class="fas fa-kidneys"></i>
+            <h2>Kidney Disease Assessment</h2>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
+                Enter your kidney function test parameters
+            </p>
+        </div>
+
+        <div class="card-body-custom">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Disclaimer:</strong> This is an AI prediction tool and should not replace professional medical advice.
+            </div>
+
+            <form id="kidneyForm">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Age (years) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="age" min="1" max="120" placeholder="e.g., 48" required>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Blood Pressure (mm Hg) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="bp" min="50" max="200" placeholder="e.g., 80" required>
+                        <div class="input-info">Normal: 90-120</div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Specific Gravity <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="sg" step="0.001" min="1.000" max="1.030" placeholder="e.g., 1.020" required>
+                        <div class="input-info">Normal: 1.005-1.030</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Albumin (0-5) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="al" min="0" max="5" placeholder="e.g., 1" required>
+                        <div class="input-info">0=Normal, 5=Severe</div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Sugar (0-5) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="su" min="0" max="5" placeholder="e.g., 0" required>
+                        <div class="input-info">0=Normal, 5=High</div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Blood Glucose (mg/dL) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="bgr" min="50" max="500" placeholder="e.g., 121" required>
+                        <div class="input-info">Normal: 70-140</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Blood Urea (mg/dL) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="bu" min="0" max="200" placeholder="e.g., 36" required>
+                        <div class="input-info">Normal: 7-20</div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Serum Creatinine (mg/dL) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="sc" step="0.1" min="0" max="15" placeholder="e.g., 1.2" required>
+                        <div class="input-info">Normal: 0.6-1.2</div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Sodium (mEq/L) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="sod" min="100" max="200" placeholder="e.g., 137" required>
+                        <div class="input-info">Normal: 136-145</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Potassium (mEq/L) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="pot" step="0.1" min="2" max="10" placeholder="e.g., 4.6" required>
+                        <div class="input-info">Normal: 3.5-5.0</div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Hemoglobin (g/dL) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="hemo" step="0.1" min="0" max="20" placeholder="e.g., 15.4" required>
+                        <div class="input-info">Normal: 12-17</div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">PCV (%) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="pcv" min="0" max="60" placeholder="e.g., 44" required>
+                        <div class="input-info">Normal: 36-48</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">WBC Count (cells/cumm) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="wc" min="2000" max="20000" placeholder="e.g., 7800" required>
+                        <div class="input-info">Normal: 4000-11000</div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">RBC Count (millions/cmm) <span class="required">*</span></label>
+                        <input type="number" class="form-control" id="rc" step="0.1" min="2" max="8" placeholder="e.g., 5.2" required>
+                        <div class="input-info">Normal: 4.5-5.5</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-predict" id="predictBtn">
+                    <i class="fas fa-brain"></i> <span id="predictBtnText">Analyze Kidney Health</span>
+                    <span id="predictSpinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                </button>
+            </form>
+
+            <div class="result-card" id="resultCard">
+                <div class="result-header">
+                    <div class="result-icon" id="resultIcon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <div class="result-title" id="resultTitle">Analysis Complete</div>
+                        <p id="resultMessage" class="mb-0"></p>
+                    </div>
+                </div>
+
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="confidenceFill" style="width: 0%">
+                        <span id="confidenceText">0%</span>
+                    </div>
+                </div>
+
+                <div class="recommendations">
+                    <h5><i class="fas fa-notes-medical"></i> Medical Recommendations</h5>
+                    <ul id="recommendationsList"></ul>
+                </div>
+
+                <div class="appointment-section">
+                    <h5 class="mb-3"><i class="fas fa-calendar-check"></i> Book an Appointment</h5>
+                    <p class="text-muted">Consult with a nephrologist for detailed evaluation and treatment plan.</p>
+                    <button class="btn-appointment" onclick="showAppointmentForm()">
+                        <i class="fas fa-user-md"></i> Schedule Appointment with Nephrologist
+                    </button>
+                </div>
+            </div>
+
+            <!-- Appointment Form -->
+            <div class="appointment-form" id="appointmentForm">
+                <h4 class="mb-4"><i class="fas fa-calendar-alt"></i> Book Your Appointment</h4>
+                <form id="bookingForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Full Name <span class="required">*</span></label>
+                            <input type="text" class="form-control" id="patientName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email <span class="required">*</span></label>
+                            <input type="email" class="form-control" id="patientEmail" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone <span class="required">*</span></label>
+                            <input type="tel" class="form-control" id="patientPhone" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Preferred Doctor <span class="required">*</span></label>
+                            <select class="form-select" id="doctorName" required>
+                                <option value="">Select Doctor</option>
+                                <option value="Dr. Robert Williams">Dr. Robert Williams - Nephrologist</option>
+                                <option value="Dr. Jennifer Taylor">Dr. Jennifer Taylor - Kidney Specialist</option>
+                                <option value="Dr. David Brown">Dr. David Brown - Renal Medicine</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Preferred Date <span class="required">*</span></label>
+                            <input type="date" class="form-control" id="appointmentDate" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Preferred Time <span class="required">*</span></label>
+                            <select class="form-select" id="appointmentTime" required>
+                                <option value="">Select Time</option>
+                                <option value="09:00">09:00 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="14:00">02:00 PM</option>
+                                <option value="15:00">03:00 PM</option>
+                                <option value="16:00">04:00 PM</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Additional Notes</label>
+                        <textarea class="form-control" id="appointmentNotes" rows="3" placeholder="Any specific concerns or symptoms..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-book w-100">
+                        <i class="fas fa-check-circle"></i> Confirm Appointment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    const API_URL = 'http://localhost:5000/api';
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    let predictionId = null;
+
+    if (!token) {
+        window.location.href = 'login.html';
+    }
+ 
+    if (user.full_name) {
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('patientName').value = user.full_name;
+            document.getElementById('patientEmail').value = user.email || '';
+        });
+    }
+
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('appointmentDate').setAttribute('min', today);
+    });
+
+    document.getElementById('kidneyForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = {
+            age: parseInt(document.getElementById('age').value),
+            bp: parseInt(document.getElementById('bp').value),
+            sg: parseFloat(document.getElementById('sg').value),
+            al: parseInt(document.getElementById('al').value),
+            su: parseInt(document.getElementById('su').value),
+            bgr: parseInt(document.getElementById('bgr').value),
+            bu: parseInt(document.getElementById('bu').value),
+            sc: parseFloat(document.getElementById('sc').value),
+            sod: parseInt(document.getElementById('sod').value),
+            pot: parseFloat(document.getElementById('pot').value),
+            hemo: parseFloat(document.getElementById('hemo').value),
+            pcv: parseInt(document.getElementById('pcv').value),
+            wc: parseInt(document.getElementById('wc').value),
+            rc: parseFloat(document.getElementById('rc').value)
+        };
+
+        const predictBtn = document.getElementById('predictBtn');
+        const predictBtnText = document.getElementById('predictBtnText');
+        const predictSpinner = document.getElementById('predictSpinner');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        predictBtn.disabled = true;
+        predictBtnText.style.display = 'none';
+        predictSpinner.style.display = 'inline-block';
+        loadingOverlay.classList.add('show');
+
+        try {
+            const response = await fetch(`${API_URL}/predict/kidney`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                predictionId = data.prediction_id;
+                displayResult(data);
+            } else {
+                alert('Error: ' + (data.error || 'Prediction failed'));
+            }
+        } catch (error) {
+            console.error('Prediction error:', error);
+            alert('Connection error. Please make sure the server is running.');
+        } finally {
+            predictBtn.disabled = false;
+            predictBtnText.style.display = 'inline';
+            predictSpinner.style.display = 'none';
+            loadingOverlay.classList.remove('show');
+        }
+    });
+
+    function displayResult(data) {
+        const resultCard = document.getElementById('resultCard');
+        const resultIcon = document.getElementById('resultIcon');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultMessage = document.getElementById('resultMessage');
+        const confidenceFill = document.getElementById('confidenceFill');
+        const confidenceText = document.getElementById('confidenceText');
+        const recommendationsList = document.getElementById('recommendationsList');
+
+        const isPositive = data.result === 'Positive';
+        const confidence = (data.confidence * 100).toFixed(1);
+
+        if (isPositive) {
+            resultIcon.classList.remove('negative');
+            resultIcon.classList.add('positive');
+            resultIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            resultTitle.textContent = 'Kidney Disease Risk Detected';
+            resultMessage.textContent = data.message;
+        } else {
+            resultIcon.classList.remove('positive');
+            resultIcon.classList.add('negative');
+            resultIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            resultTitle.textContent = 'No Kidney Disease Risk';
+            resultMessage.textContent = data.message;
+        }
+
+        setTimeout(() => {
+            confidenceFill.style.width = confidence + '%';
+            confidenceText.textContent = `Confidence: ${confidence}%`;
+        }, 100);
+
+        recommendationsList.innerHTML = data.recommendations.map(rec => 
+            `<li><i class="fas fa-check-circle"></i> ${rec}</li>`
+        ).join('');
+
+        resultCard.classList.add('show');
+        resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function showAppointmentForm() {
+        const appointmentForm = document.getElementById('appointmentForm');
+        appointmentForm.classList.add('show');
+        appointmentForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const appointmentData = {
+            doctor_name: document.getElementById('doctorName').value,
+            specialization: 'Nephrologist',
+            appointment_date: document.getElementById('appointmentDate').value,
+            appointment_time: document.getElementById('appointmentTime').value,
+            notes: document.getElementById('appointmentNotes').value,
+            prediction_id: predictionId
+        };
+
+        try {
+            const response = await fetch(`${API_URL}/appointments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(appointmentData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('✅ Appointment booked successfully!\n\nYou will receive a confirmation email shortly.');
+                document.getElementById('bookingForm').reset();
+                document.getElementById('appointmentForm').classList.remove('show');
+            } else {
+                alert('❌ Failed to book appointment: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Appointment booking error:', error);
+            alert('Connection error. Please try again.');
+        }
+    });
+</script>
+</body>
+</html>

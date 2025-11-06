@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Registration - AarogyaAI</title>
+
+  <!-- Bootstrap & FontAwesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+    /* Page Background */
+    body {
+      font-family: 'Poppins', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, rgba(118, 139, 231, 0.45), rgba(215,184,245,0.45)),
+                  url('images/background.jpg') center/cover no-repeat fixed;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #2c3e50;
+    }
+  
+    /* Main Container */
+    .register-container {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+      display: flex;
+      flex-wrap: wrap;
+      overflow: hidden;
+      width: 90%;
+      max-width: 880px;
+      animation: fadeIn 1s ease-in-out;
+    }
+  
+    /* Left Section */
+    .register-left {
+      flex: 1;
+      background: linear-gradient(135deg, #2980b9, #2980b9);
+      color: white;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+  
+    .register-left i {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: floatIcon 3s ease-in-out infinite;
+    }
+  
+    .register-left h2 {
+      font-weight: 700;
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+    }
+  
+    .register-left p {
+      opacity: 0.9;
+      font-size: 1rem;
+      max-width: 280px;
+      line-height: 1.6;
+    }
+  
+    /* Right Section */
+    .register-right {
+      flex: 1;
+      padding: 55px 50px;
+      background: rgba(255,255,255,0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+  
+    .register-right h3 {
+      text-align: center;
+      color: #2980b9;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+  
+    /* Navigation link */
+    .back-home a {
+      text-decoration: none;
+      color: #2980b9;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+  
+    .back-home a:hover {
+      color: #138d75;
+    }
+  
+    /* Input Fields — Modern Style */
+    .form-group {
+      margin-bottom: 20px;
+    }
+  
+    .form-label {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+      display: block;
+    }
+  
+    .input-group {
+      position: relative;
+    }
+  
+    .input-group i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #2980b9;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+  
+    .form-control {
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 12px 15px 12px 45px;
+      font-size: 0.95rem;
+      color: #2c3e50;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+  
+    .form-control:focus {
+      background: #fff;
+      box-shadow: 0 0 10px rgba(26, 188, 156, 0.3);
+      outline: none;
+    }
+  
+    .input-group:focus-within i {
+      color: #2980b9;
+      transform: translateY(-50%) scale(1.1);
+    }
+  
+    select.form-control {
+      appearance: none;
+      cursor: pointer;
+    }
+  
+    /* Button */
+    .btn-register {
+      width: 100%;
+      padding: 14px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #2980b9, #2980b9);
+      color: white;
+      border: none;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+  
+    .btn-register:hover {
+      transform: scale(1.03);
+      box-shadow: 0 8px 20px rgba(26,188,156,0.4);
+    }
+  
+    /* Bottom text link */
+    .signup-link {
+      text-align: center;
+      margin-top: 15px;
+      color: #7f8c8d;
+      font-size: 0.9rem;
+    }
+  
+    .signup-link a {
+      color: #2980b9;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  
+    .signup-link a:hover {
+      text-decoration: underline;
+    }
+  
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  
+    @keyframes floatIcon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+  
+    /* Responsive Layout */
+    @media (max-width: 768px) {
+      .register-container {
+        flex-direction: column;
+        max-width: 420px;
+      }
+  
+      .register-left {
+        padding: 40px 30px;
+      }
+  
+      .register-right {
+        padding: 40px 30px;
+      }
+  
+      .register-left i {
+        font-size: 65px;
+      }
+    }
+  </style>
+  
+</head>
+
+<body>
+  <div class="register-container">
+    <div class="register-left">
+      <i class="fas fa-user-plus"></i>
+      <h2>Patient Registration</h2>
+      <p>Join AarogyaAI to manage your health easily.</p>
+      <p class="mt-3">Get instant AI-powered predictions & connect with specialists.</p>
+    </div>
+
+    <div class="register-right">
+      <div class="back-home">
+        <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Home</a>
+      </div>
+
+      <div class="register-header">
+        <h3>Create Account</h3>
+        <p>Fill in your details to register</p>
+      </div>
+
+      <form id="registerForm">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" id="full_name" class="form-control" placeholder="Enter your full name" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <div class="input-group">
+            <i class="fas fa-user-circle"></i>
+            <input type="text" id="username" class="form-control" placeholder="Choose a username" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <div class="input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          <div class="input-group">
+            <i class="fas fa-phone"></i>
+            <input type="text" id="phone" class="form-control" placeholder="Enter phone number">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Gender</label>
+          <div class="input-group">
+            <i class="fas fa-venus-mars"></i>
+            <select id="gender" class="form-control">
+              <option value="">Select gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" class="form-control" placeholder="Enter password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-register">Register</button>
+      </form>
+
+      <div class="signup-link">
+        Already have an account? <a href="patient-login.html">Login here</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = `${window.location.origin}/api/register`;
+
+    document.querySelector("#registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const full_name = document.querySelector("#full_name").value.trim();
+      const username = document.querySelector("#username").value.trim();
+      const email = document.querySelector("#email").value.trim();
+      const password = document.querySelector("#password").value.trim();
+      const phone = document.querySelector("#phone").value.trim();
+      const gender = document.querySelector("#gender").value;
+
+      if (!full_name || !username || !email || !password) {
+        alert("⚠️ Please fill in all required fields.");
+        return;
+      }
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, email, password, full_name, phone, gender })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          alert("✅ Registration successful! Please log in.");
+          window.location.href = "patient-login.html";
+        } else {
+          alert("❌ " + (data.error || "Registration failed. Try again."));
+        }
+      } catch (err) {
+        console.error("Registration error:", err);
+        alert("🚨 Server error. Please try again later.");
+      }
+    });
+  </script>
+</body>
+</html>

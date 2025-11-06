@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AarogyaAI - Home</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #64b3f4, #c2e59c);
+      background-image: url('images/background.jpg');
+      min-height: 100vh;
+      background-size: cover;            
+      background-repeat: no-repeat;      
+      background-position: center; 
+      color: #2c3e50;
+      text-align: center;
+      padding: 100px 20px;
+               
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      font-weight: bold;
+      color: #3498db;
+      margin-bottom: 20px;
+    }
+    .btn-custom {
+      border-radius: 25px;
+      font-weight: 600;
+      padding: 12px 30px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-heartbeat"></i> AarogyaAI</h1>
+    <p>Welcome to AarogyaAI — a smart healthcare assistant for patients and doctors.</p>
+
+    <div class="mt-4">
+      <a href="patient-login.html" class="btn btn-primary btn-custom">
+        <i class="fas fa-user"></i> Patient Portal
+      </a>
+      <a href="doctor-login.html" class="btn btn-success btn-custom">
+        <i class="fas fa-user-md"></i> Doctor Portal
+      </a>
+    </div>
+  </div>
+
+  <!-- ✅ Role-Based Redirect Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+      if (token && user && user.role) {
+        const role = user.role.toLowerCase();
+
+        if (role === "patient" || role === "user") {
+          console.log("Redirecting patient to dashboard...");
+          window.location.replace("patient-dashboard.html");
+        } 
+        else if (role === "doctor") {
+          console.log("Redirecting doctor to dashboard...");
+          window.location.replace("doctor-dashboard.html");
+        }
+      }
+    });
+  </script>
+</body>
+</html>

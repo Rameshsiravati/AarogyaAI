@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Login - AarogyaAI</title>
+
+  <!-- Bootstrap & FontAwesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Poppins', 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, rgba(118,139,231,0.45), rgba(215,184,245,0.45)),
+                  url('images/background.jpg') center/cover no-repeat fixed;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #2c3e50;
+    }
+
+    /* Main container */
+    .login-card {
+      display: flex;
+      flex-wrap: wrap;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+      width: 90%;
+      max-width: 900px;
+      overflow: hidden;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    /* Left Section */
+    .login-left {
+      flex: 1;
+      background: linear-gradient(135deg, #2980b9, #2980b9);
+      color: white;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .login-left i {
+      font-size: 85px;
+      margin-bottom: 20px;
+      animation: floatIcon 3s ease-in-out infinite;
+    }
+
+    .login-left h2 {
+      font-weight: 700;
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+    }
+
+    .login-left p {
+      font-size: 1rem;
+      opacity: 0.9;
+      max-width: 280px;
+      line-height: 1.6;
+    }
+
+    /* Right Section */
+    .login-right {
+      flex: 1;
+      padding: 55px 50px;
+      background: rgba(255,255,255,0.95);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .login-right h3 {
+      text-align: center;
+      color: #2980b9;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Navigation link */
+    .back-home a {
+      text-decoration: none;
+      color: #2980b9;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .back-home a:hover {
+      color: #138d75;
+    }
+
+    /* Input Fields (Copied Style from Register Page) */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #2980b9;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .form-control {
+      border: none;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 12px 15px 12px 45px;
+      font-size: 0.95rem;
+      color: #2c3e50;
+      transition: all 0.3s ease-in-out;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .form-control:focus {
+      background: #fff;
+      box-shadow: 0 0 10px rgba(52,152,219,0.3);
+      outline: none;
+    }
+
+    .input-group:focus-within i {
+      color: #2980b9;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    /* Button */
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #2980b9, #2980b9);
+      color: white;
+      border: none;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-login:hover {
+      transform: scale(1.03);
+      box-shadow: 0 8px 20px rgba(26,188,156,0.4);
+    }
+
+    /* Alert Box */
+    #alertBox {
+      text-align: center;
+      border-radius: 12px;
+      font-weight: 500;
+      color: #2c3e50;
+      background-color: rgba(231, 244, 255, 0.8);
+      border: 1px solid #a7d3f4;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes floatIcon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .login-card { flex-direction: column; max-width: 420px; }
+      .login-left { padding: 40px 30px; }
+      .login-right { padding: 40px 30px; }
+      .login-left i { font-size: 65px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="login-card">
+    <!-- Left Side -->
+    <div class="login-left">
+      <i class="fas fa-heartbeat"></i>
+      <h2>Welcome to AarogyaAI</h2>
+      <p>Empowering patients with intelligent healthcare and personalized access to medical records.</p>
+    </div>
+
+    <!-- Right Side -->
+    <div class="login-right">
+      <div class="back-home mb-3">
+        <a href="index.html"><i class="fas fa-arrow-left me-2"></i>Back to Home</a>
+      </div>
+
+      <h3>Patient Login</h3>
+
+      <p id="alertBox" class="alert" role="alert">Your health, our priority 💙</p>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <div class="input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" id="username" class="form-control" placeholder="Enter your username" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login">
+          <span id="loginText">Login</span>
+          <span id="loginSpinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+        </button>
+      </form>
+
+      <p class="text-center text-muted mt-4">
+        Don’t have an account?
+        <a href="patient-register.html" class="fw-bold" style="color:#2980b9;">Register here</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const API_URL = `${window.location.origin}/api/login`;
+
+    const form = document.getElementById("loginForm");
+    const alertBox = document.getElementById("alertBox");
+    const loginSpinner = document.getElementById("loginSpinner");
+    const loginText = document.getElementById("loginText");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      alertBox.style.display = "none";
+      loginSpinner.style.display = "inline-block";
+      loginText.textContent = "Logging in...";
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!username || !password) {
+        showError("Please enter both username and password");
+        resetButton();
+        return;
+      }
+
+      try {
+        const resp = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password }),
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok || data.error) {
+          showError(data.error || "Invalid username or password");
+          resetButton();
+          return;
+        }
+
+         
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+         
+        window.location.replace("patient-dashboard.html");
+
+      } catch (error) {
+        showError("Server error. Please try again later.");
+      } finally {
+        resetButton();
+      }
+    });
+
+    function showError(message) {
+      alertBox.textContent = message;
+      alertBox.style.display = "block";
+    }
+
+    function resetButton() {
+      loginSpinner.style.display = "none";
+      loginText.textContent = "Login";
+    }
+  </script>
+
+</body>
+</html>

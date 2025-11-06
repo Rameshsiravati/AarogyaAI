@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Dashboard - AarogyaAI</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+  
+    html, body {
+      height: 100%;
+      width: 100%;
+      scroll-behavior: smooth;
+      overflow-x: hidden;
+      background: #ebeff7;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+  
+     
+    #loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+    }
+    #loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 1rem 0;
+    }
+  
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #4a90e2;
+    }
+  
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #4a90e2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+  
+    /* Main layout */
+    .main-content {
+      padding: 2rem 0 5rem;
+      min-height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+  
+    .container {
+      max-width: 1100px;
+    }
+    .logout-btn {
+      background: #e74c3c; color: white; border: none; border-radius: 20px;
+      padding: 0.5rem 1.2rem; font-weight: 600;
+    }
+    .logout-btn:hover { background: #c0392b; }
+  
+    /* Welcome card */
+    .welcome-card {
+      background: linear-gradient(135deg,#667eea 0%,#64c0eb 100%);
+      color: white;
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+  
+    /* Stats section */
+    .stats-card {
+      background: white;
+      border-radius: 15px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+    .stats-card:hover {
+      transform: translateY(-3px);
+    }
+    .stats-card i {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      color: #4a90e2;
+    }
+    .stats-card h3 {
+      font-size: 2rem;
+      color: #2c3e50;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+  
+    /* Disease cards */
+    .disease-card {
+      background: white;
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+      cursor: pointer;
+      border-left: 5px solid;
+      transition: all 0.3s ease;
+    }
+    .disease-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+    }
+    .disease-card.diabetes { border-color: #e73c53; }
+    .disease-card.heart { border-color: #3498db; }
+    .disease-card.liver { border-color: #ee8c36; }
+    .disease-card.kidney { border-color: #9b59b6; }
+    .disease-icon { font-size: 3rem; margin-bottom: 1rem; }
+  
+    /* Buttons */
+    .predict-btn {
+      padding: 0.75rem 2rem;
+      border-radius: 25px;
+      border: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      width: 100%;
+      color: white;
+    }
+    .predict-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .diabetes-btn { background: #e73c53; }
+    .heart-btn { background: #3498db; }
+    .liver-btn { background: #ee8c36; }
+    .kidney-btn { background: #9b59b6; }
+  
+    /* Recent Predictions */
+    .recent-predictions {
+      background: white;
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+      margin-top: 2rem;
+    }
+  
+    .prediction-item {
+      padding: 1rem;
+      border-bottom: 1px solid #ecf0f1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  
+    .prediction-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+  
+    .positive { background: #fee; color: #e74c3c; }
+    .negative { background: #dff0d8; color: #27ae60; }
+  
+    /* Responsive Fixes */
+    @media (max-width: 768px) {
+      .welcome-card h2 { font-size: 1.5rem; }
+      .disease-card { padding: 1.5rem; }
+      .predict-btn { font-size: 0.9rem; }
+    }
+  </style>
+  
+</head>
+
+<body>
+  <!-- Loader -->
+  <div id="loader" class="d-flex justify-content-center align-items-center vh-100 bg-white">
+    <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container">
+      <a class="navbar-brand" href="#"><i class="fas fa-heartbeat"></i> AarogyaAI -Patient</a>
+      <div class="user-info ms-auto">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <span id="userName">User</span>
+        <button class="logout-btn" onclick="logout()">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Dashboard -->
+  <div class="main-content">
+    <div class="container">
+      <div class="welcome-card">
+        <h2>Welcome, <span id="welcomeName">User</span> 👋</h2>
+        <p>Start your health journey — select a checkup and get AI-powered insights instantly!</p>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-3"><div class="stats-card"><i class="fas fa-clipboard-list"></i><h3 id="totalPredictions">0</h3><p>Total Predictions</p></div></div>
+        <div class="col-md-3"><div class="stats-card"><i class="fas fa-calendar-check"></i><h3 id="totalAppointments">0</h3><p>Appointments</p></div></div>
+        <div class="col-md-3"><div class="stats-card"><i class="fas fa-check-circle"></i><h3 id="healthyResults">0</h3><p>Healthy Results</p></div></div>
+        <div class="col-md-3"><div class="stats-card"><i class="fas fa-exclamation-triangle"></i><h3 id="riskResults">0</h3><p>Risk Detected</p></div></div>
+      </div>
+
+      <h3 class="section-title"><i class="fas fa-stethoscope"></i> Disease Predictions</h3>
+
+      <div class="row">
+        <div class="col-md-6"><div class="disease-card diabetes" onclick="window.location.href='diabetes.html'"><div class="disease-icon"><i class="fas fa-syringe"></i></div><h4>Diabetes</h4><p>Check your diabetes risk instantly.</p><button class="predict-btn diabetes-btn">Start <i class="fas fa-arrow-right"></i></button></div></div>
+        <div class="col-md-6"><div class="disease-card heart" onclick="window.location.href='heart.html'"><div class="disease-icon"><i class="fas fa-heartbeat"></i></div><h4>Heart</h4><p>Assess heart disease risk easily.</p><button class="predict-btn heart-btn">Start <i class="fas fa-arrow-right"></i></button></div></div>
+        <div class="col-md-6"><div class="disease-card liver" onclick="window.location.href='liver.html'"><div class="disease-icon"><i class="fas fa-laptop-medical"></i></div><h4>Liver</h4><p>Check liver health indicators.</p><button class="predict-btn liver-btn">Start <i class="fas fa-arrow-right"></i></button></div></div>
+        <div class="col-md-6"><div class="disease-card kidney" onclick="window.location.href='kidney.html'"><div class="disease-icon"><i class="fas fa-disease"></i></div><h4>Kidney</h4><p>Evaluate kidney function health.</p><button class="predict-btn kidney-btn">Start <i class="fas fa-arrow-right"></i></button></div></div>
+      </div>
+
+      <div class="recent-predictions">
+        <h3><i class="fas fa-history"></i> Recent Predictions</h3>
+        <div id="recentPredictionsList">
+          <p class="text-muted text-center">No predictions yet. Try a checkup!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = `${window.location.origin}/api`;
+
+          document.addEventListener("DOMContentLoaded", async () => {
+          const loader = document.getElementById("loader");
+          const token = localStorage.getItem("token");
+          const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+          if (!token || !user || user.role?.toLowerCase() !== "patient") {
+            window.location.replace("patient-login.html");
+            return;
+          }
+
+          loader.classList.remove("hidden");
+          initDashboard(user, token);
+          setTimeout(() => loader.classList.add("hidden"), 700);
+            });
+
+
+    function initDashboard(user, token) {
+      document.getElementById("userName").textContent = user.full_name || user.username || "User";
+      document.getElementById("welcomeName").textContent = user.full_name || user.username || "User";
+      const firstLetter = (user.full_name?.charAt(0) || user.username?.charAt(0) || "U").toUpperCase();
+      document.getElementById("userAvatar").textContent = firstLetter;
+      loadDashboardData(token);
+    }
+
+    function logout() {
+      localStorage.clear();
+      window.location.replace("patient-login.html");
+    }
+
+    async function loadDashboardData(token) {
+        try {
+          const [statsResp, recentResp] = await Promise.all([
+            fetch(`${API_URL}/stats`, { headers: { Authorization: `Bearer ${token}` } }),
+            fetch(`${API_URL}/recent-predictions`, { headers: { Authorization: `Bearer ${token}` } })
+          ]);
+
+          const statsData = await statsResp.json();
+          const recentData = await recentResp.json();
+
+           
+          if (statsData.success) {
+            document.getElementById("totalPredictions").textContent = statsData.total_predictions || 0;
+            document.getElementById("totalAppointments").textContent = statsData.total_appointments || 0;
+            document.getElementById("healthyResults").textContent = statsData.healthy_results || 0;
+            document.getElementById("riskResults").textContent = statsData.risk_detected || 0;
+          }
+
+           
+          if (recentData.success && Array.isArray(recentData.predictions)) {
+            displayRecentPredictions(recentData.predictions);
+          } else {
+            document.getElementById("recentPredictionsList").innerHTML =
+              "<p class='text-muted text-center'>No predictions yet. Try a checkup!</p>";
+          }
+        } catch (err) {
+          console.error("Error loading dashboard:", err);
+        }
+    }
+
+
+    function updateStatistics(predictions) {
+      document.getElementById("totalPredictions").textContent = predictions.length;
+      const healthy = predictions.filter((p) => p.prediction_result === "Negative").length;
+      const risk = predictions.filter((p) => p.prediction_result === "Positive").length;
+      document.getElementById("healthyResults").textContent = healthy;
+      document.getElementById("riskResults").textContent = risk;
+    }
+
+    function displayRecentPredictions(predictions) {
+      const container = document.getElementById("recentPredictionsList");
+      if (!predictions.length) {
+        container.innerHTML = `<p class='text-muted text-center'>No predictions yet. Try a checkup!</p>`;
+        return;
+      }
+      container.innerHTML = predictions.slice(0, 5).map(
+        (p) => `
+          <div class="prediction-item">
+            <div>
+              <strong>${p.disease_type || "Unknown"}</strong><br>
+              <small class="text-muted">${p.prediction_date ? new Date(p.prediction_date).toLocaleDateString() : ""}</small>
+            </div>
+            <div>
+              <span class="prediction-badge ${p.prediction_result === "Positive" ? "positive" : "negative"}">
+                ${p.prediction_result === "Positive" ? "Risk Detected" : "No Risk"}
+              </span>
+            </div>
+          </div>`
+      ).join("");
+    }
+  </script>
+</body>
+</html>

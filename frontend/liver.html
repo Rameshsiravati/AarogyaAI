@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liver Disease Prediction - AarogyaAI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fcc81db9 0%, #fcc81db9 100%);
+            min-height: 100vh;
+            padding: 20px;
+            background:
+                linear-gradient(135deg, rgba(118, 139, 231, 0.45) 0%, rgba(215,184,245,0.45) 100%),
+                url('images/background.jpg') center/cover no-repeat fixed;
+        }
+        .container-custom { max-width: 900px; margin: 0 auto; }
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.3); transform: translateX(-5px); }
+        .prediction-card { background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow: hidden; }
+        .card-header-custom {
+            background: linear-gradient(135deg, #fcc81db9, #fcc81db9);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .card-header-custom i { font-size: 3rem; margin-bottom: 1rem; }
+        .card-header-custom h2 { margin: 0; font-weight: bold; }
+        .card-body-custom { padding: 2.5rem; }
+        .form-label { font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem; }
+        .form-label .required { color: #fcc81db9; }
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #fcc81db9;
+            box-shadow: 0 0 0 0.2rem rgba(231, 76, 60, 0.25);
+        }
+        .input-info { font-size: 0.85rem; color: #7f8c8d; margin-top: 0.25rem; }
+        .btn-predict {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #fcc81db9, #fcc81db9);
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+            cursor: pointer;
+        }
+        .btn-predict:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4); }
+        .btn-predict:disabled { opacity: 0.6; cursor: not-allowed; }
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border-left: 5px solid #e74c3c;
+            display: none;
+        }
+        .result-card.show { display: block; animation: slideIn 0.5s ease; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .result-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .result-icon { font-size: 3rem; }
+        .result-icon.positive { color: #e74c3c; }
+        .result-icon.negative { color: #27ae60; }
+        .result-title { font-size: 1.5rem; font-weight: bold; color: #2c3e50; }
+        .confidence-bar {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fcc81db9, #fcc81db9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 1s ease;
+        }
+        .recommendations { background: white; padding: 1.5rem; border-radius: 10px; margin-top: 1.5rem; }
+        .recommendations h5 { color: #2c3e50; margin-bottom: 1rem; font-weight: bold; }
+        .recommendations ul { list-style: none; padding: 0; }
+        .recommendations li {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #e74c3c;
+        }
+        .recommendations li i { color: #e74c3c; margin-right: 0.5rem; }
+        .appointment-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 2px solid #e0e0e0;
+        }
+        .btn-appointment {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-appointment:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+        .appointment-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-top: 1.5rem;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .appointment-form.show { display: block; animation: slideIn 0.5s ease; }
+        .btn-book {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-book:hover { transform: scale(1.05); }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading-overlay.show { display: flex; }
+        .loading-content { text-align: center; color: white; }
+        .spinner { width: 60px; height: 60px; border: 5px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 768px) { .card-body-custom { padding: 1.5rem; } }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h4>Analyzing your liver health data...</h4>
+            <p>Please wait while our AI processes your information</p>
+        </div>
+    </div>
+
+    <div class="container-custom">
+        <button class="back-btn" onclick="window.location.href='dashboard.html'">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </button>
+
+        <div class="prediction-card">
+            <div class="card-header-custom">
+                <i class="fas fa-laptop-medical"></i>
+                <h2>Liver Disease Assessment</h2>
+                <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
+                    Enter your liver function test parameters
+                </p>
+            </div>
+
+            <div class="card-body-custom">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Disclaimer:</strong> This is an AI prediction tool and should not replace professional medical advice.
+                </div>
+
+                <form id="liverForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Age (years) <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="age" min="1" max="120" placeholder="e.g., 45" required>
+                            <div class="input-info">Your current age</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Gender <span class="required">*</span></label>
+                            <select class="form-select" id="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="1">Male</option>
+                                <option value="0">Female</option>
+                            </select>
+                            <div class="input-info">Select your gender</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Total Bilirubin (mg/dL) <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="totalBilirubin" step="0.1" min="0" max="100" placeholder="e.g., 0.7" required>
+                            <div class="input-info">Normal: 0.1-1.2 mg/dL</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Direct Bilirubin (mg/dL) <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="directBilirubin" step="0.1" min="0" max="50" placeholder="e.g., 0.1" required>
+                            <div class="input-info">Normal: 0.0-0.3 mg/dL</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Alkaline Phosphotase (IU/L) <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="alkalinePhosphotase" min="0" max="2000" placeholder="e.g., 187" required>
+                            <div class="input-info">Normal: 44-147 IU/L</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Alamine Aminotransferase (IU/L) <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="alamineAminotransferase" min="0" max="2000" placeholder="e.g., 16" required>
+                            <div class="input-info">ALT - Normal: 7-56 IU/L</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Aspartate Aminotransferase (IU/L) <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="aspartateAminotransferase" min="0" max="2000" placeholder="e.g., 18" required>
+                            <div class="input-info">AST - Normal: 10-40 IU/L</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Total Proteins (g/dL) <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="totalProteins" step="0.1" min="0" max="15" placeholder="e.g., 6.8" required>
+                            <div class="input-info">Normal: 6.0-8.3 g/dL</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Albumin (g/dL) <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="albumin" step="0.1" min="0" max="10" placeholder="e.g., 3.3" required>
+                            <div class="input-info">Normal: 3.5-5.5 g/dL</div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Albumin/Globulin Ratio <span class="required">*</span></label>
+                            <input type="number" class="form-control" id="albuminGlobulinRatio" step="0.1" min="0" max="5" placeholder="e.g., 0.9" required>
+                            <div class="input-info">Normal: 1.0-2.5</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-predict" id="predictBtn">
+                        <i class="fas fa-brain"></i> <span id="predictBtnText">Analyze Liver Health</span>
+                        <span id="predictSpinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                    </button>
+                </form>
+
+                <div class="result-card" id="resultCard">
+                    <div class="result-header">
+                        <div class="result-icon" id="resultIcon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <div class="result-title" id="resultTitle">Analysis Complete</div>
+                            <p id="resultMessage" class="mb-0"></p>
+                        </div>
+                    </div>
+
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="confidenceFill" style="width: 0%">
+                            <span id="confidenceText">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="recommendations">
+                        <h5><i class="fas fa-notes-medical"></i> Medical Recommendations</h5>
+                        <ul id="recommendationsList"></ul>
+                    </div>
+
+                    <div class="appointment-section">
+                        <h5 class="mb-3"><i class="fas fa-calendar-check"></i> Book an Appointment</h5>
+                        <p class="text-muted">Consult with a hepatologist for detailed evaluation and treatment plan.</p>
+                        <button class="btn-appointment" onclick="showAppointmentForm()">
+                            <i class="fas fa-user-md"></i> Schedule Appointment with Hepatologist
+                        </button>
+                    </div>
+                </div>
+
+                <div class="appointment-form" id="appointmentForm">
+                    <h4 class="mb-4"><i class="fas fa-calendar-alt"></i> Book Your Appointment</h4>
+                    <form id="bookingForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Full Name <span class="required">*</span></label>
+                                <input type="text" class="form-control" id="patientName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email <span class="required">*</span></label>
+                                <input type="email" class="form-control" id="patientEmail" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Phone <span class="required">*</span></label>
+                                <input type="tel" class="form-control" id="patientPhone" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Preferred Doctor <span class="required">*</span></label>
+                                <select class="form-select" id="doctorName" required>
+                                    <option value="">Select Doctor</option>
+                                    <option value="Dr. Sarah Johnson">Dr. Sarah Johnson - Hepatologist</option>
+                                    <option value="Dr. Michael Chen">Dr. Michael Chen - Gastroenterologist</option>
+                                    <option value="Dr. Emily Davis">Dr. Emily Davis - Liver Specialist</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Preferred Date <span class="required">*</span></label>
+                                <input type="date" class="form-control" id="appointmentDate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Preferred Time <span class="required">*</span></label>
+                                <select class="form-select" id="appointmentTime" required>
+                                    <option value="">Select Time</option>
+                                    <option value="09:00">09:00 AM</option>
+                                    <option value="10:00">10:00 AM</option>
+                                    <option value="11:00">11:00 AM</option>
+                                    <option value="14:00">02:00 PM</option>
+                                    <option value="15:00">03:00 PM</option>
+                                    <option value="16:00">04:00 PM</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Additional Notes</label>
+                            <textarea class="form-control" id="appointmentNotes" rows="3" placeholder="Any specific concerns or symptoms..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-book w-100">
+                            <i class="fas fa-check-circle"></i> Confirm Appointment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        let predictionId = null;
+
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        if (user.full_name) {
+            document.addEventListener('DOMContentLoaded', () => {
+                document.getElementById('patientName').value = user.full_name;
+                document.getElementById('patientEmail').value = user.email || '';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('appointmentDate').setAttribute('min', today);
+        });
+
+        document.getElementById('liverForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                Age: parseInt(document.getElementById('age').value),
+                Gender: document.getElementById('gender').value,
+                Total_Bilirubin: parseFloat(document.getElementById('totalBilirubin').value),
+                Direct_Bilirubin: parseFloat(document.getElementById('directBilirubin').value),
+                Alkaline_Phosphotase: parseInt(document.getElementById('alkalinePhosphotase').value),
+                Alamine_Aminotransferase: parseInt(document.getElementById('alamineAminotransferase').value),
+                Aspartate_Aminotransferase: parseInt(document.getElementById('aspartateAminotransferase').value),
+                Total_Protiens: parseFloat(document.getElementById('totalProteins').value),
+                Albumin: parseFloat(document.getElementById('albumin').value),
+                Albumin_and_Globulin_Ratio: parseFloat(document.getElementById('albuminGlobulinRatio').value)
+            };
+
+            const predictBtn = document.getElementById('predictBtn');
+            const predictBtnText = document.getElementById('predictBtnText');
+            const predictSpinner = document.getElementById('predictSpinner');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            predictBtn.disabled = true;
+            predictBtnText.style.display = 'none';
+            predictSpinner.style.display = 'inline-block';
+            loadingOverlay.classList.add('show');
+
+            try {
+                const response = await fetch(`${API_URL}/predict/liver`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    predictionId = data.prediction_id;
+                    displayResult(data);
+                } else {
+                    alert('Error: ' + (data.error || 'Prediction failed'));
+                }
+            } catch (error) {
+                console.error('Prediction error:', error);
+                alert('Connection error. Please make sure the server is running.');
+            } finally {
+                predictBtn.disabled = false;
+                predictBtnText.style.display = 'inline';
+                predictSpinner.style.display = 'none';
+                loadingOverlay.classList.remove('show');
+            }
+        });
+
+        function displayResult(data) {
+            const resultCard = document.getElementById('resultCard');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultMessage = document.getElementById('resultMessage');
+            const confidenceFill = document.getElementById('confidenceFill');
+            const confidenceText = document.getElementById('confidenceText');
+            const recommendationsList = document.getElementById('recommendationsList');
+
+            const isPositive = data.result === 'Positive';
+            const confidence = (data.confidence * 100).toFixed(1);
+
+            if (isPositive) {
+                resultIcon.classList.remove('negative');
+                resultIcon.classList.add('positive');
+                resultIcon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                resultTitle.textContent = 'Liver Disease Risk Detected';
+                resultMessage.textContent = data.message;
+            } else {
+                resultIcon.classList.remove('positive');
+                resultIcon.classList.add('negative');
+                resultIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                resultTitle.textContent = 'No Liver Disease Risk';
+                resultMessage.textContent = data.message;
+            }
+
+            setTimeout(() => {
+                confidenceFill.style.width = confidence + '%';
+                confidenceText.textContent = `Confidence: ${confidence}%`;
+            }, 100);
+
+            recommendationsList.innerHTML = data.recommendations.map(rec => 
+                `<li><i class="fas fa-check-circle"></i> ${rec}</li>`
+            ).join('');
+
+            resultCard.classList.add('show');
+            resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function showAppointmentForm() {
+            const appointmentForm = document.getElementById('appointmentForm');
+            appointmentForm.classList.add('show');
+            appointmentForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const appointmentData = {
+                doctor_name: document.getElementById('doctorName').value,
+                specialization: 'Hepatologist',
+                appointment_date: document.getElementById('appointmentDate').value,
+                appointment_time: document.getElementById('appointmentTime').value,
+                notes: document.getElementById('appointmentNotes').value,
+                prediction_id: predictionId
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/appointments`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(appointmentData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Appointment booked successfully!\n\nYou will receive a confirmation email shortly.');
+                    document.getElementById('bookingForm').reset();
+                    document.getElementById('appointmentForm').classList.remove('show');
+                } else {
+                    alert('❌ Failed to book appointment: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Appointment booking error:', error);
+                alert('Connection error. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

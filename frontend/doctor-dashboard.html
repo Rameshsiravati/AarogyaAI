@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doctor Dashboard - AarogyaAI</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #eef3fc;
+      opacity: 0;
+      transition: opacity 0.4s ease-in-out;
+    }
+    body.visible { opacity: 1; }
+
+    .navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 1rem; }
+    .logout-btn {
+      background: #e74c3c; color: white; border: none; border-radius: 20px;
+      padding: 0.5rem 1.2rem; font-weight: 600;
+    }
+    .logout-btn:hover { background: #c0392b; }
+
+    .welcome-card {
+      background: linear-gradient(135deg, #27ae60, #229954);
+      color: white; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;
+    }
+
+    .stats-card {
+      background: #fff; border-radius: 10px; padding: 1.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); text-align: center;
+    }
+    .stats-card i { font-size: 1.8rem; margin-bottom: 10px; color: #27ae60; }
+
+    .appointment-item { border-left: 5px solid #27ae60; }
+
+    .btn-approve { background: #27ae60; color: white; border: none; }
+    .btn-reject { background: #e74c3c; color: white; border: none; }
+    .btn-approve:hover { background: #229954; }
+    .btn-reject:hover { background: #c0392b; }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a class="navbar-brand fw-bold text-success"><i class="fas fa-hospital"></i> AarogyaAI - Doctor</a>
+      <div class="d-flex align-items-center gap-2">
+        <div class="user-avatar bg-success text-white rounded-circle px-3 py-2" id="doctorAvatar">D</div>
+        <span id="doctorName">Doctor</span>
+        <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="container py-4">
+    <div class="welcome-card">
+      <h2>Welcome, Dr. <span id="welcomeName">Doctor</span>!</h2>
+      <p id="specializationText">Specialization: General Medicine</p>
+    </div>
+
+    <div class="row mb-4" id="statsContainer"></div>
+
+    <!-- Appointment List -->
+    <div id="appointmentList" class="text-center">
+      <div class="spinner-border text-success"></div>
+      <p>Loading appointments...</p>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://localhost:5000/api";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const token = localStorage.getItem("token");
+      const doctorData = JSON.parse(localStorage.getItem("doctor") || "{}");
+
+      if (!token || doctorData.role !== "doctor") {
+        window.location.replace("doctor-login.html");
+        return;
+      }
+
+      document.body.classList.add("visible");
+      initDoctorDashboard(doctorData, token);
+    });
+
+    
+    function initDoctorDashboard(doctor, token) {
+      document.getElementById("doctorName").textContent = doctor.full_name || "Doctor";
+      document.getElementById("welcomeName").textContent = doctor.full_name || "Doctor";
+      document.getElementById("specializationText").textContent = `Specialization: ${doctor.specialization || "N/A"}`;
+      document.getElementById("doctorAvatar").textContent = doctor.full_name?.charAt(0).toUpperCase() || "D";
+      loadAppointments(token);
+    }
+
+    
+    function logout() {
+      localStorage.removeItem("token");
+      localStorage.removeItem("doctor");
+      window.location.replace("doctor-login.html");
+    }
+
+    
+    async function loadAppointments(token) {
+      const listContainer = document.getElementById("appointmentList");
+      const statsContainer = document.getElementById("statsContainer");
+
+      try {
+        const response = await fetch(`${API_URL}/appointments/doctor`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+
+        if (!data.success) throw new Error(data.error || "Failed to load appointments");
+
+        const appointments = data.appointments || [];
+
+        
+        const total = appointments.length;
+        const approved = appointments.filter((a) => a.status === "approved").length;
+        const pending = appointments.filter((a) => a.status === "pending").length;
+        const rejected = appointments.filter((a) => a.status === "rejected").length;
+
+        statsContainer.innerHTML = `
+          <div class="col-md-3"><div class="stats-card"><i class="fas fa-clipboard-list"></i><h3>${total}</h3><p>Total</p></div></div>
+          <div class="col-md-3"><div class="stats-card"><i class="fas fa-hourglass-half"></i><h3>${pending}</h3><p>Pending</p></div></div>
+          <div class="col-md-3"><div class="stats-card"><i class="fas fa-check-circle"></i><h3>${approved}</h3><p>Approved</p></div></div>
+          <div class="col-md-3"><div class="stats-card"><i class="fas fa-times-circle"></i><h3>${rejected}</h3><p>Rejected</p></div></div>
+        `;
+
+         
+        if (!appointments.length) {
+          listContainer.innerHTML = `<div class="text-center text-muted mt-4"><p>No appointments yet.</p></div>`;
+          return;
+        }
+
+        listContainer.innerHTML = appointments
+          .map(
+            (apt) => `
+          <div class="appointment-item mb-3 p-3 rounded shadow-sm bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="mb-1">${apt.patient_name || "Unknown Patient"}</h5>
+                <small class="text-muted">📅 ${apt.appointment_date} | ⏰ ${apt.appointment_time}</small><br>
+                <small>Email: ${apt.patient_email || "N/A"} | Phone: ${apt.patient_phone || "N/A"}</small>
+              </div>
+              <div>
+                <span class="badge ${getStatusClass(apt.status)} px-3 py-2 text-uppercase">${apt.status}</span>
+              </div>
+            </div>
+            ${apt.notes ? `<p class="mt-2 mb-2"><strong>Notes:</strong> ${apt.notes}</p>` : ""}
+
+            ${apt.status === "pending"
+              ? `
+              <div class="mt-3 d-flex gap-2">
+                <button class="btn btn-approve btn-sm" onclick="updateStatus(${apt.id}, 'approved')">
+                  <i class="fas fa-check-circle"></i> Approve
+                </button>
+                <button class="btn btn-reject btn-sm" onclick="rejectAppointment(${apt.id})">
+                  <i class="fas fa-times-circle"></i> Reject
+                </button>
+              </div>`
+              : ""}
+          </div>`
+          )
+          .join("");
+      } catch (err) {
+        console.error("Error loading appointments:", err);
+        listContainer.innerHTML = `<div class="text-center text-danger mt-4">Error loading data</div>`;
+      }
+    }
+
+     
+      async function updateStatus(appointmentId, newStatus, reason = null) {
+      const token = localStorage.getItem("token");
+      const endpoint =
+        newStatus === "approved"
+          ? `${API_URL}/doctor/appointments/${appointmentId}/approve`
+          : `${API_URL}/doctor/appointments/${appointmentId}/reject`;
+
+      try {
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ reason }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          alert(`✅ Appointment ${newStatus} successfully!`);
+          loadAppointments(token);
+        } else {
+          alert(`❌ Failed: ${data.error || "Unknown error"}`);
+        }
+      } catch (err) {
+        console.error("Error updating appointment:", err);
+        alert("Server error. Please try again.");
+      }
+    }
+
+    
+    function rejectAppointment(appointmentId) {
+      const reason = prompt("Enter reason for rejection (optional):");
+      updateStatus(appointmentId, "rejected", reason);
+    }
+
+    function getStatusClass(status) {
+      switch (status) {
+        case "approved":
+          return "bg-success text-white";
+        case "rejected":
+          return "bg-danger text-white";
+        case "pending":
+          return "bg-warning text-dark";
+        default:
+          return "bg-secondary text-white";
+      }
+    }
+  </script>
+</body>
+</html>
