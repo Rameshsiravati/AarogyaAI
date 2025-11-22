@@ -44,7 +44,7 @@
       pointer-events: none;
     }
   
-    /* Navbar */
+    
     .navbar {
       position: sticky;
       top: 0;
@@ -78,7 +78,7 @@
       font-weight: bold;
     }
   
-    /* Main layout */
+     
     .main-content {
       padding: 2rem 0 5rem;
       min-height: calc(100vh - 80px);
@@ -96,7 +96,7 @@
     }
     .logout-btn:hover { background: #c0392b; }
   
-    /* Welcome card */
+     
     .welcome-card {
       background: linear-gradient(135deg,#667eea 0%,#64c0eb 100%);
       color: white;
@@ -106,7 +106,7 @@
       box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     }
   
-    /* Stats section */
+    
     .stats-card {
       background: white;
       border-radius: 15px;
@@ -131,7 +131,7 @@
       font-weight: bold;
     }
   
-    /* Disease cards */
+     
     .disease-card {
       background: white;
       border-radius: 15px;
@@ -152,7 +152,7 @@
     .disease-card.kidney { border-color: #9b59b6; }
     .disease-icon { font-size: 3rem; margin-bottom: 1rem; }
   
-    /* Buttons */
+    
     .predict-btn {
       padding: 0.75rem 2rem;
       border-radius: 25px;
@@ -198,7 +198,7 @@
     .positive { background: #fee; color: #e74c3c; }
     .negative { background: #dff0d8; color: #27ae60; }
   
-    /* Responsive Fixes */
+     
     @media (max-width: 768px) {
       .welcome-card h2 { font-size: 1.5rem; }
       .disease-card { padding: 1.5rem; }
@@ -228,7 +228,7 @@
     </div>
   </nav>
 
-  <!-- Main Dashboard -->
+   
   <div class="main-content">
     <div class="container">
       <div class="welcome-card">
@@ -305,11 +305,12 @@
 
            
           if (statsData.success) {
-            document.getElementById("totalPredictions").textContent = statsData.total_predictions || 0;
-            document.getElementById("totalAppointments").textContent = statsData.total_appointments || 0;
-            document.getElementById("healthyResults").textContent = statsData.healthy_results || 0;
-            document.getElementById("riskResults").textContent = statsData.risk_detected || 0;
+              document.getElementById("totalPredictions").textContent = statsData.total_predictions || 0;
+              document.getElementById("totalAppointments").textContent = statsData.total_appointments || 0;
+              document.getElementById("healthyResults").textContent = statsData.healthy_results || 0;
+              document.getElementById("riskResults").textContent = statsData.risk_detected || 0;
           }
+
 
            
           if (recentData.success && Array.isArray(recentData.predictions)) {

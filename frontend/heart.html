@@ -153,7 +153,7 @@
             font-weight: 600;
             transition: all 0.3s ease;
         }
-        .btn-book:hover { transform: scale(1.05); }
+        .btn-book:hover { transform: scale(1.05);box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4); }
         .loading-overlay {
             display: none;
             position: fixed;
@@ -366,13 +366,19 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone <span class="required">*</span></label>
-                                <input type="tel" class="form-control" id="patientPhone" required>
+                                <input type="text"
+                                class="form-control"
+                                id="patientPhone"
+                                maxlength="10"
+                                pattern="[6-9][0-9]{9}"
+                                placeholder="Enter 10-digit mobile number"
+                                required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Preferred Doctor <span class="required">*</span></label>
                                 <select class="form-select" id="doctorName" required>
                                     <option value="">Select Doctor</option>
-                                    <option value="Dr. John Smith">Dr. John Smith - Cardiologist</option>
+                                    <option value="Dr. Michael Chen">Dr. Michael Chen - Cardiologist</option>
                                     <option value="Dr. Mary Johnson">Dr. Mary Johnson - Heart Specialist</option>
                                     <option value="Dr. David Brown">Dr. David Brown - Cardiac Surgeon</option>
                                 </select>

@@ -27,13 +27,12 @@ MODELS_DIR = os.path.join(BASE_DIR, 'models')
 app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path='')
 CORS(app)
 
-# Initialize database and email service
+ 
 db = Database()
 email_service = EmailService()
 
 # =====================================================
-# LOAD MACHINE LEARNING MODELS (robust)
-# Each entry becomes: {"model": estimator, "scaler": Optional, "feature_columns": Optional}
+# LOAD MACHINE LEARNING MODELS
 # =====================================================
 models = {}
 def load_models():
@@ -42,11 +41,11 @@ def load_models():
         path = os.path.join(MODELS_DIR, f'{disease}_model.pkl')
         if os.path.exists(path):
             obj = joblib.load(path)
-            # Normalize
+            
             if hasattr(obj, 'predict'):
                 models[disease] = {'model': obj, 'scaler': None, 'feature_columns': None}
             elif isinstance(obj, dict):
-                # Ensure keys exist
+                 
                 models[disease] = {
                     'model': obj.get('model') or obj.get('estimator') or obj.get('clf'),
                     'scaler': obj.get('scaler'),
@@ -211,6 +210,7 @@ def get_history():
         app.logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
+ 
 # =====================================================
 # DASHBOARD STATS + RECENT PREDICTIONS (FIXED)
 # =====================================================
@@ -218,30 +218,36 @@ def get_history():
 @token_required
 def get_stats():
     try:
-        role = getattr(request, 'role', None)
-        user_id = getattr(request, 'user_id', None)
+        if request.role == 'patient':
+             
+            predictions = db.get_user_predictions(request.user_id)
 
-        if role != 'patient':
+            total_predictions = len(predictions)
+            healthy_results = sum(1 for p in predictions if p['prediction_result'] == 'Negative')
+            risk_detected = sum(1 for p in predictions if p['prediction_result'] == 'Positive')
+
+            
+            user_appointments = db.get_user_appointments(request.user_id)
+            total_appointments = len(user_appointments)
+
+            return jsonify({
+                'success': True,
+                'total_predictions': total_predictions,
+                'healthy_results': healthy_results,
+                'risk_detected': risk_detected,
+                'total_appointments': total_appointments
+            })
+
+        elif request.role == 'doctor':
+            stats = db.get_appointment_statistics(doctor_id=request.user_id)
+            return jsonify({'success': True, 'stats': stats})
+
+        else:
             return jsonify({'success': False, 'error': 'Unauthorized'}), 403
 
-        predictions = db.get_user_predictions(user_id) or []
-        appointments = db.get_user_appointments(user_id) or []
-
-        total_predictions = len(predictions)
-        healthy_results = sum(1 for p in predictions if p.get('prediction_result') == 'Negative')
-        risk_detected = sum(1 for p in predictions if p.get('prediction_result') == 'Positive')
-        total_appointments = len(appointments)
-
-        return jsonify({
-            'success': True,
-            'total_predictions': total_predictions,
-            'healthy_results': healthy_results,
-            'risk_detected': risk_detected,
-            'appointments': total_appointments
-        })
     except Exception as e:
         print("🔥 Error in /api/stats:", e)
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -249,24 +255,81 @@ def get_stats():
 @token_required
 def get_recent_predictions():
     try:
-        role = getattr(request, 'role', None)
-        user_id = getattr(request, 'user_id', None)
-
-        if role != 'patient':
+        if request.role != 'patient':
             return jsonify({'success': False, 'error': 'Unauthorized'}), 403
 
-        preds = db.get_user_predictions(user_id) or []
-        preds = preds[:5]  # Limit to last 5
+        preds = db.get_user_predictions(request.user_id) or []
+         
+        preds = sorted(preds, key=lambda x: x['prediction_date'], reverse=True)[:5]
 
         return jsonify({'success': True, 'predictions': preds})
+
     except Exception as e:
         print("🔥 Error in /api/recent-predictions:", e)
-        traceback.print_exc()
+        import traceback; traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+# =====================================================
+# RECENT PREDICTIONS 
+# =====================================================
+@app.route('/api/stats', methods=['GET'],endpoint='stats')
+@token_required
+def get_stats():
+    try:
+        if request.role == 'patient':
+             
+            predictions = db.get_user_predictions(request.user_id)
+
+            total_predictions = len(predictions)
+            healthy_results = sum(1 for p in predictions if p['prediction_result'] == 'Negative')
+            risk_detected = sum(1 for p in predictions if p['prediction_result'] == 'Positive')
+
+             
+            user_appointments = db.get_user_appointments(request.user_id)
+            total_appointments = len(user_appointments)
+
+            return jsonify({
+                'success': True,
+                'total_predictions': total_predictions,
+                'healthy_results': healthy_results,
+                'risk_detected': risk_detected,
+                'total_appointments': total_appointments
+            })
+
+        elif request.role == 'doctor':
+            stats = db.get_appointment_statistics(doctor_id=request.user_id)
+            return jsonify({'success': True, 'stats': stats})
+
+        else:
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+    except Exception as e:
+        print("🔥 Error in /api/stats:", e)
+        import traceback; traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/recent-predictions', methods=['GET'], endpoint='recent_predictions')
+@token_required
+def get_recent_predictions():
+    try:
+        if request.role != 'patient':
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+
+        preds = db.get_user_predictions(request.user_id) or []
+         
+        preds = sorted(preds, key=lambda x: x['prediction_date'], reverse=True)[:5]
+
+        return jsonify({'success': True, 'predictions': preds})
+
+    except Exception as e:
+        print("🔥 Error in /api/recent-predictions:", e)
+        import traceback; traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
 
-# 🩺 Update appointment status (Approve / Reject)
+
+ 
 @app.route('/api/appointments/<int:appointment_id>', methods=['PUT'])
 @token_required
 def update_appointment_status(current_user, appointment_id):
@@ -306,7 +369,7 @@ def update_appointment_status(current_user, appointment_id):
         return jsonify({"success": False, "error": str(e)}), 500
 
 # =====================================================
-# PREDICTION ROUTES (FIXED)
+# PREDICTION ROUTES 
 # =====================================================
 @app.route('/api/predict/<disease>', methods=['POST'])
 @token_required
@@ -385,13 +448,63 @@ def predict_disease(disease):
 # =====================================================
 def get_recommendations(disease, prediction):
     if disease == 'diabetes':
-        return ['Consult an endocrinologist', 'Monitor glucose levels'] if prediction else ['Maintain a balanced diet', 'Exercise regularly']
+        return ['Consult an endocrinologist or diabetologist immediately',
+            'Get HbA1c and fasting blood sugar tests done',
+            'Monitor blood glucose levels regularly',
+            'Follow a balanced diet with controlled carbohydrates',
+            'Regular physical activity (30 minutes daily)',
+            'Maintain healthy body weight',
+            'Stay hydrated and avoid sugary drinks'] if prediction else ['Maintain a healthy lifestyle to prevent diabetes',
+            'Regular health checkups annually',
+            'Balanced diet with plenty of vegetables and fruits',
+            'Regular exercise (at least 150 minutes per week)',
+            'Maintain healthy body weight',
+            'Limit sugar and processed food intake']
     if disease == 'heart':
-        return ['Consult a cardiologist', 'Monitor blood pressure'] if prediction else ['Avoid smoking', 'Maintain a heart-healthy diet']
+        return ['Consult a cardiologist urgently',
+            'Get ECG, Echo, and cardiac enzyme tests',
+            'Monitor blood pressure daily',
+            'Take prescribed medications regularly',
+            'Reduce salt and fatty food intake',
+            'Quit smoking and limit alcohol',
+            'Manage stress through relaxation techniques',
+            'Regular moderate exercise as advised by doctor'] if prediction else ['Maintain heart-healthy lifestyle',
+            'Regular cardiovascular checkups',
+            'Balanced diet rich in omega-3 fatty acids',
+            'Regular aerobic exercise',
+            'Maintain healthy blood pressure and cholesterol',
+            'Avoid smoking and excessive alcohol',
+            'Manage stress effectively']
     if disease == 'liver':
-        return ['Avoid alcohol', 'Consult a hepatologist'] if prediction else ['Eat liver-friendly foods', 'Stay hydrated']
+        return ['Consult a hepatologist or gastroenterologist',
+            'Get liver function tests (LFT) done',
+            'Ultrasound or CT scan of liver may be required',
+            'Avoid alcohol completely',
+            'Maintain healthy diet with limited fats',
+            'Stay hydrated',
+            'Avoid unnecessary medications',
+            'Get vaccinated for Hepatitis A and B'] if prediction else ['Maintain liver health through healthy lifestyle',
+            'Limit alcohol consumption',
+            'Balanced diet with adequate protein',
+            'Regular exercise',
+            'Avoid unnecessary medications',
+            'Stay hydrated',
+            'Get vaccinated for Hepatitis if not done']
     if disease == 'kidney':
-        return ['Consult a nephrologist', 'Limit salt intake'] if prediction else ['Drink enough water', 'Regular kidney tests']
+        return ['Consult a nephrologist immediately',
+            'Get kidney function tests (creatinine, BUN, GFR)',
+            'Ultrasound of kidneys may be required',
+            'Monitor blood pressure regularly',
+            'Control diabetes if present',
+            'Limit salt and protein intake as advised',
+            'Stay well hydrated',
+            'Avoid NSAIDs and nephrotoxic drugs'] if prediction else ['Maintain kidney health through healthy habits',
+            'Drink adequate water daily (8-10 glasses)',
+            'Regular exercise',
+            'Maintain healthy blood pressure',
+            'Control blood sugar if diabetic',
+            'Limit salt intake',
+            'Avoid excessive protein supplements']
     return []
 
 # =====================================================
@@ -409,6 +522,19 @@ def book_appointment():
         for f in required:
             if f not in data:
                 return jsonify({'error': f'Missing field: {f}'}), 400
+         
+        existing = db.check_slot(
+            doctor_name=data['doctor_name'],
+            appointment_date=data['appointment_date'],
+            appointment_time=data['appointment_time']
+            )
+
+        if existing:
+            return jsonify({
+                'success': False,
+                'error': 'This time slot is already booked. Please choose another time.'
+                }), 400
+ 
 
         apt_id = db.save_appointment(
             user_id=request.user_id,
@@ -454,7 +580,7 @@ def get_appointments():
         return jsonify({'error': str(e)}), 500
 
 
-# 🔹 Doctor dashboard expects this exact route
+ 
 @app.route('/api/appointments/doctor', methods=['GET'])
 @token_required
 def get_doctor_appointments():
@@ -540,7 +666,7 @@ def health():
     return jsonify({'status': 'healthy', 'models_loaded': list(models.keys()), 'time': datetime.utcnow().isoformat()})
 
  
-# SERVE FRONTEND
+ 
  
 @app.route('/')
 def serve_index():

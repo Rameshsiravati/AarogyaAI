@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Patient Registration - AarogyaAI</title>
 
-  <!-- Bootstrap & FontAwesome -->
+   
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
   
-    /* Page Background */
+     
     body {
       font-family: 'Poppins', 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, rgba(118, 139, 231, 0.45), rgba(215,184,245,0.45)),
@@ -24,7 +24,7 @@
       color: #2c3e50;
     }
   
-    /* Main Container */
+     
     .register-container {
       background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(12px);
@@ -38,7 +38,7 @@
       animation: fadeIn 1s ease-in-out;
     }
   
-    /* Left Section */
+    
     .register-left {
       flex: 1;
       background: linear-gradient(135deg, #2980b9, #2980b9);
@@ -70,7 +70,7 @@
       line-height: 1.6;
     }
   
-    /* Right Section */
+     
     .register-right {
       flex: 1;
       padding: 55px 50px;
@@ -87,7 +87,7 @@
       margin-bottom: 1.5rem;
     }
   
-    /* Navigation link */
+     
     .back-home a {
       text-decoration: none;
       color: #2980b9;
@@ -152,7 +152,7 @@
       cursor: pointer;
     }
   
-    /* Button */
+     
     .btn-register {
       width: 100%;
       padding: 14px;
@@ -171,7 +171,7 @@
       box-shadow: 0 8px 20px rgba(26,188,156,0.4);
     }
   
-    /* Bottom text link */
+     
     .signup-link {
       text-align: center;
       margin-top: 15px;
@@ -189,7 +189,7 @@
       text-decoration: underline;
     }
   
-    /* Animations */
+     
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -271,7 +271,9 @@
           <label class="form-label">Phone</label>
           <div class="input-group">
             <i class="fas fa-phone"></i>
-            <input type="text" id="phone" class="form-control" placeholder="Enter phone number">
+            <input type="text" id="phone" class="form-control" 
+                  maxlength="10" pattern="[6-9][0-9]{9}" placeholder="Enter phone number"
+                  required>
           </div>
         </div>
 

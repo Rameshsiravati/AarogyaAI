@@ -128,13 +128,10 @@
             padding: 0.75rem 2rem;
             border-radius: 10px;
             font-weight: 600;
-            transition: all 0.3s ease;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .btn-appointment:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
-        }
+        .btn-appointment:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4); }
         .appointment-form {
             background: white;
             padding: 2rem;
@@ -153,7 +150,7 @@
             font-weight: 600;
             transition: all 0.3s ease;
         }
-        .btn-book:hover { transform: scale(1.05); }
+        .btn-book:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);}
         .loading-overlay {
             display: none;
             position: fixed;
@@ -331,15 +328,21 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone <span class="required">*</span></label>
-                                <input type="tel" class="form-control" id="patientPhone" required>
+                                <input type="text"
+                                class="form-control"
+                                id="patientPhone"
+                                maxlength="10"
+                                pattern="[6-9][0-9]{9}"
+                                placeholder="Enter 10-digit mobile number"
+                                required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Preferred Doctor <span class="required">*</span></label>
                                 <select class="form-select" id="doctorName" required>
                                     <option value="">Select Doctor</option>
-                                    <option value="Dr. Sarah Johnson">Dr. Sarah Johnson - Hepatologist</option>
+                                    <option value="Dr. Emily Davis">Dr. Emily Davis - Hepatologist</option>
                                     <option value="Dr. Michael Chen">Dr. Michael Chen - Gastroenterologist</option>
-                                    <option value="Dr. Emily Davis">Dr. Emily Davis - Liver Specialist</option>
+                                    <option value="Dr.  Davis">Dr. Davis - Liver Specialist</option>
                                 </select>
                             </div>
                         </div>

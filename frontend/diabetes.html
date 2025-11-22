@@ -312,13 +312,19 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Phone <span class="required">*</span></label>
-                                <input type="tel" class="form-control" id="patientPhone" required>
+                                <input type="text"
+                                class="form-control"
+                                id="patientPhone"
+                                maxlength="10"
+                                pattern="[6-9][0-9]{9}"
+                                placeholder="Enter 10-digit mobile number"
+                                required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Preferred Doctor <span class="required">*</span></label>
                                 <select class="form-select" id="doctorName" required>
                                     <option value="">Select Doctor</option>
-                                    <option value="Dr. Robert Williams">Dr. Robert Williams - Diabetologist</option>
+                                    <option value="Dr. Sarah Johnson">Dr. Sarah Johnson - Diabetologist</option>
                                     <option value="Dr. Lisa Anderson">Dr. Lisa Anderson - Endocrinologist</option>
                                     <option value="Dr. James Miller">Dr. James Miller - Diabetes Specialist</option>
                                 </select>

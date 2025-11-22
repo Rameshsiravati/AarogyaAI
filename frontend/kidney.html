@@ -19,7 +19,7 @@
                 url('images/background.jpg') center/cover no-repeat fixed;
         }
         .container-custom { max-width: 900px; margin: 0 auto; }
-        .back-btn {
+        /* .back-btn {
             background: rgba(255,255,255,0.2);
             color: white;
             border: none;
@@ -29,7 +29,17 @@
             margin-bottom: 1.5rem;
             transition: all 0.3s ease;
             cursor: pointer;
-        }
+        } */
+        .btn-book {
+            background: linear-gradient(135deg, #27ae60, #229954) !important;
+            color: white !important;
+            border: none !important;
+            padding: 0.75rem 2rem !important;
+            border-radius: 10px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            }
+
         .back-btn:hover { background: rgba(255,255,255,0.3); transform: translateX(-5px); }
 
         .prediction-card {
@@ -141,7 +151,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .btn-appointment:hover { transform: scale(1.05); }
+        .btn-appointment:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4); }
 
         .appointment-form {
             background: white;
@@ -353,7 +363,13 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Phone <span class="required">*</span></label>
-                            <input type="tel" class="form-control" id="patientPhone" required>
+                            <input type="text"
+                            class="form-control"
+                            id="patientPhone"
+                            maxlength="10"
+                            pattern="[6-9][0-9]{9}"
+                            placeholder="Enter 10-digit mobile number"
+                            required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Preferred Doctor <span class="required">*</span></label>

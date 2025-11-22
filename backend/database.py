@@ -392,6 +392,23 @@ class Database:
         columns = [desc[0] for desc in cur.description]
         conn.close()
         return [dict(zip(columns, row)) for row in rows]
+    def check_slot(self, doctor_name, appointment_date, appointment_time):
+        conn = self.get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT id FROM appointments
+            WHERE doctor_name = ?
+            AND appointment_date = ?
+            AND appointment_time = ?
+            AND status IN ('pending', 'approved')
+        """, (doctor_name, appointment_date, appointment_time))
+
+        result = cursor.fetchone()
+        conn.close()
+
+        return result is not None
+
 
     def update_appointment_status(self, appointment_id, status, doctor_id=None, reason=None):
         conn = self.get_connection()
@@ -447,3 +464,4 @@ class Database:
             'approved': approved,
             'rejected': rejected
         }
+     

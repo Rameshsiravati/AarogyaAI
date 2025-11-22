@@ -106,7 +106,7 @@ MediCare-AI/
 ### Step 1: Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/mediCare-AI.git
+git clone https://github.com/Rameshsiravati/AarogyaAI.git
 cd mediCare-AI/backend
 ```
 
@@ -258,7 +258,10 @@ Access at [http://127.0.0.1:5000](http://127.0.0.1:5000)
 * Admin dashboard.
 * PDF report generation.
 * Chatbot integration.
+* Reporting & Documentation
 
+Downloadable Health Reports (PDF):
+Patients can generate and download detailed health summary reports.
 ---
 
 ## 👨‍💻 Author

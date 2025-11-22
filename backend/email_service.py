@@ -6,16 +6,16 @@ from email.utils import formataddr
 
 class EmailService:
     def __init__(self):
-        # SMTP config
+         
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port_tls = 587   # STARTTLS
         self.smtp_port_ssl = 465   # SSL fallback
 
-        # Prefer environment variables for safety; fallback to given defaults
+         
         self.sender_email = os.getenv("MAIL_SENDER", "siravatiramesh@gmail.com")
         self.sender_password = os.getenv("MAIL_APP_PASSWORD", "vhlk wyum rpzi vjmn")  # Gmail App Password
 
-        # Branding / Info
+         
         self.hospital_name = os.getenv("HOSPITAL_NAME", "MediCare AI Hospital")
         self.hospital_phone = os.getenv("HOSPITAL_PHONE", "+1 (555) 123-4567")
         self.hospital_address = os.getenv("HOSPITAL_ADDRESS", "123 Health Street, Medical City")
@@ -58,9 +58,9 @@ class EmailService:
         try:
             if not self.sender_email or not self.sender_password:
                 print(f"⚠️ Email not configured. Skipping send to {to_email}.")
-                return True  # Don't break app if email creds are missing
+                return True  
 
-            # Build MIME with plain text fallback
+             
             msg = MIMEMultipart("alternative")
             msg["Subject"] = subject
             msg["From"] = formataddr((self.hospital_name, self.sender_email))
@@ -74,7 +74,7 @@ class EmailService:
             msg.attach(MIMEText(plain_fallback, "plain"))
             msg.attach(MIMEText(html_body, "html"))
 
-            # Try STARTTLS first
+            
             try:
                 with smtplib.SMTP(self.smtp_server, self.smtp_port_tls, timeout=20) as server:
                     server.ehlo()
@@ -87,7 +87,7 @@ class EmailService:
             except Exception as e_tls:
                 print(f"ℹ️ TLS send failed ({e_tls}). Trying SSL...")
 
-            # Fallback to SSL
+             
             with smtplib.SMTP_SSL(self.smtp_server, self.smtp_port_ssl, timeout=20) as server:
                 server.login(self.sender_email, self.sender_password)
                 server.send_message(msg)
@@ -102,13 +102,13 @@ class EmailService:
             print(f"❌ Email sending error: {e}")
             return False
 
-    # -------------------------- Public APIs (unchanged) --------------------------
+    # -------------------------- Public APIs --------------------------
 
     def send_email(self, to_email, subject, body):
         """Backwards-compatible: body is full HTML."""
         return self._send(to_email, subject, body)
 
-    # 🩺 Appointment Booking Confirmation (Patient just booked)
+     
     def send_appointment_booking_notification(self, patient_email, patient_name, doctor_name, appointment_date, appointment_time):
         subject = f"📅 Appointment Booked - {self.hospital_name}"
         content = f"""
@@ -131,7 +131,7 @@ class EmailService:
         html = self._frame_html("📅 Appointment Booked", "#3498db", content)
         return self._send(patient_email, subject, html)
 
-    # ✅ Appointment Approved by Doctor (this is what triggers the patient's confirmation email)
+     
     def send_appointment_confirmation(self, patient_email, patient_name, doctor_name, appointment_date, appointment_time, specialization):
         subject = f"✅ Appointment Confirmed - {self.hospital_name}"
         content = f"""
@@ -152,7 +152,7 @@ class EmailService:
         html = self._frame_html("✅ Appointment Confirmed", "#27ae60", content)
         return self._send(patient_email, subject, html)
 
-    # ❌ Appointment Rejected by Doctor
+     
     def send_appointment_rejection(self, patient_email, patient_name, doctor_name, appointment_date, appointment_time, reason=None):
         subject = f"⚠️ Appointment Update - {self.hospital_name}"
         reason_html = f"<div><strong>Reason:</strong> {reason}</div>" if reason else ""
